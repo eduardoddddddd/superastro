@@ -70,15 +70,20 @@ function initCitySearch(inputId, resultsId, onSelect) {
 }
 
 // ─── Tabs ─────────────────────────────────────────────────────
-function initTabs(containerSel) {
-  const container = document.querySelector(containerSel);
-  if (!container) return;
-  const buttons = container.querySelectorAll('.tab-btn');
-  const panels = container.querySelectorAll('.tab-panel');
-  buttons.forEach(btn => {
+// Inicializa TODAS las pestañas de la página de una vez.
+// Cada .tab-btn busca sus hermanos dentro del mismo .tabs bar
+// y los panels dentro del padre (.card o similar).
+function initTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
+      const tabsBar = btn.parentElement;          // el div.tabs
+      const card    = tabsBar.parentElement;      // el .card contenedor
+
+      // desactivar todos los botones del mismo grupo
+      tabsBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      // desactivar todos los panels del mismo card
+      card.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
       btn.classList.add('active');
       const target = document.getElementById(btn.dataset.tab);
       if (target) target.classList.add('active');
