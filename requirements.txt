@@ -1,0 +1,15 @@
+# SuperAstro dependencies
+
+# Backend
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# Astrología
+pyswisseph>=2.10.3.2
+
+# Desktop wrapper (opcional — solo para ventana nativa)
+pywebview>=4.4.1
+
+# Ya incluido en Python stdlib:
+# sqlite3, zoneinfo, dataclasses

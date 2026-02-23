@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carta Natal — SuperAstro</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">✦ SuperAstro</div>
+  <ul class="navbar-nav">
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/natal" class="active">Carta Natal</a></li>
+    <li><a href="/transits">Tránsitos</a></li>
+    <li><a href="/horary">Horaria</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <div class="grid-2">
+
+    <!-- ── LEFT: Form + Saved ─────────────────────── -->
+    <div>
+      <div class="card">
+        <div class="card-title">Datos de Nacimiento</div>
+
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="name" placeholder="Ej: Juan García">
+        </div>
+
+        <div class="form-group">
+          <label>Ciudad de nacimiento</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" id="city-input" placeholder="Escribe la ciudad...">
+            <div class="autocomplete-results" id="city-results"></div>
+          </div>
+          <input type="hidden" id="lat">
+          <input type="hidden" id="lon">
+          <input type="hidden" id="timezone">
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Año</label>
+            <input type="number" id="year" min="1800" max="2100" placeholder="1990">
+          </div>
+          <div class="form-group">
+            <label>Mes</label>
+            <input type="number" id="month" min="1" max="12" placeholder="6">
+          </div>
+          <div class="form-group">
+            <label>Día</label>
+            <input type="number" id="day" min="1" max="31" placeholder="15">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Hora</label>
+            <input type="number" id="hour" min="0" max="23" placeholder="14">
+          </div>
+          <div class="form-group">
+            <label>Minutos</label>
+            <input type="number" id="minute" min="0" max="59" placeholder="30">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sistema de Casas</label>
+          <select id="house-system">
+            <option value="P">Placidus</option>
+            <option value="K">Koch</option>
+            <option value="R">Regiomontanus</option>
+            <option value="C">Campanus</option>
+            <option value="E">Casas Iguales</option>
+          </select>
+        </div>
+
+        <div id="error-msg"></div>
+
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" id="btn-calculate" style="flex:1">
+            <span id="btn-text">Calcular Carta</span>
+          </button>
+          <button class="btn btn-secondary" id="btn-save" title="Guardar carta" style="width:48px;justify-content:center" disabled>
+            💾
+          </button>
+        </div>
+      </div>
+
+      <!-- Saved charts -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title" style="margin-bottom:12px">Cartas Guardadas</div>
+        <div id="saved-charts-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">📂</div>
+            <p>Cargando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Results ─────────────────────────── -->
+    <div id="results-area" style="display:none">
+
+      <!-- Chart wheel -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Rueda Astrológica</div>
+        <div id="chart-wheel-container">
+          <svg id="chart-wheel" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <!-- ASC / MC strip -->
+        <div id="asc-mc-strip" style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"></div>
+      </div>
+
+      <!-- Tabs: planetas / aspectos / interpretaciones -->
+      <div class="card">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="tab-planets">Planetas</button>
+          <button class="tab-btn" data-tab="tab-aspects">Aspectos</button>
+          <button class="tab-btn" data-tab="tab-interpretations">Interpretaciones</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-planets">
+          <div id="planet-table-container"></div>
+        </div>
+
+        <div class="tab-panel" id="tab-aspects">
+          <div id="aspects-container"></div>
+        </div>
+
+        <div class="tab-panel" id="tab-interpretations">
+          <div id="interpretations-container"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty right panel -->
+    <div id="empty-area">
+      <div class="card" style="text-align:center;padding:60px 24px">
+        <div style="font-size:64px;margin-bottom:16px;opacity:0.3">🌟</div>
+        <div style="color:var(--text-dim);font-size:15px">
+          Introduce los datos de nacimiento<br>y pulsa <strong>Calcular Carta</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script>
+// ── Dignity helper (client-side, matches Python logic) ────────
+const DIGNITIES = {
+  'Sol':      { dom: ['Leo'],      exalt: ['Aries'],      det: ['Acuario'],  fall: ['Libra'] },
+  'Luna':     { dom: ['Cáncer'],   exalt: ['Tauro'],      det: ['Capricornio'], fall: ['Escorpio'] },
+  'Mercurio': { dom: ['Géminis','Virgo'], exalt: ['Virgo'], det: ['Sagitario','Piscis'], fall: ['Piscis'] },
+  'Venus':    { dom: ['Tauro','Libra'],  exalt: ['Piscis'], det: ['Escorpio','Aries'],  fall: ['Virgo'] },
+  'Marte':    { dom: ['Aries','Escorpio'], exalt: ['Capricornio'], det: ['Libra','Tauro'], fall: ['Cáncer'] },
+  'Júpiter':  { dom: ['Sagitario','Piscis'], exalt: ['Cáncer'], det: ['Géminis','Virgo'], fall: ['Capricornio'] },
+  'Saturno':  { dom: ['Capricornio','Acuario'], exalt: ['Libra'], det: ['Cáncer','Leo'], fall: ['Aries'] },
+};
+function getDignity(planet, sign) {
+  const d = DIGNITIES[planet];
+  if (!d) return 'Peregrino';
+  if (d.dom.includes(sign))   return 'Domicilio';
+  if (d.exalt.includes(sign)) return 'Exaltación';
+  if (d.det.includes(sign))   return 'Detrimento';
+  if (d.fall.includes(sign))  return 'Caída';
+  return 'Peregrino';
+}
+
+// ── State ─────────────────────────────────────────────────────
+let currentChart = null;
+let selectedCity = null;
+
+// ── Init ──────────────────────────────────────────────────────
+initCitySearch('city-input', 'city-results', (city) => {
+  selectedCity = city;
+  document.getElementById('lat').value = city.lat;
+  document.getElementById('lon').value = city.lon;
+  document.getElementById('timezone').value = city.timezone;
+});
+initTabs('.card');
+loadSavedCharts();
+
+// ── Calculate ─────────────────────────────────────────────────
+document.getElementById('btn-calculate').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-calculate');
+  const btnText = document.getElementById('btn-text');
+  const errEl = document.getElementById('error-msg');
+  errEl.innerHTML = '';
+
+  const lat = parseFloat(document.getElementById('lat').value);
+  const lon = parseFloat(document.getElementById('lon').value);
+  const tz  = document.getElementById('timezone').value;
+
+  if (!tz || isNaN(lat)) {
+    errEl.innerHTML = '<div class="alert alert-error">Selecciona una ciudad de la lista</div>';
+    return;
+  }
+
+  btnText.innerHTML = '<span class="spinner"></span> Calculando...';
+  btn.disabled = true;
+
+  try {
+    const data = await API.post('/api/natal/calculate', {
+      name: document.getElementById('name').value || 'Sin nombre',
+      year:   parseInt(document.getElementById('year').value),
+      month:  parseInt(document.getElementById('month').value),
+      day:    parseInt(document.getElementById('day').value),
+      hour:   parseInt(document.getElementById('hour').value),
+      minute: parseInt(document.getElementById('minute').value),
+      lat, lon,
+      timezone: tz,
+      house_system: document.getElementById('house-system').value,
+    });
+
+    currentChart = data;
+    renderResults(data);
+    document.getElementById('btn-save').disabled = false;
+
+  } catch (e) {
+    errEl.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+  } finally {
+    btnText.textContent = 'Calcular Carta';
+    btn.disabled = false;
+  }
+});
+
+// ── Save ──────────────────────────────────────────────────────
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const lat = parseFloat(document.getElementById('lat').value);
+  const lon = parseFloat(document.getElementById('lon').value);
+  const tz  = document.getElementById('timezone').value;
+  const name = document.getElementById('name').value || 'Sin nombre';
+  try {
+    await API.post('/api/natal/save', {
+      name,
+      year:   parseInt(document.getElementById('year').value),
+      month:  parseInt(document.getElementById('month').value),
+      day:    parseInt(document.getElementById('day').value),
+      hour:   parseInt(document.getElementById('hour').value),
+      minute: parseInt(document.getElementById('minute').value),
+      lat, lon,
+      timezone: tz,
+      city_name: selectedCity ? selectedCity.display : '',
+      house_system: document.getElementById('house-system').value,
+    });
+    loadSavedCharts();
+    document.getElementById('error-msg').innerHTML =
+      `<div class="alert alert-success">Carta de ${name} guardada</div>`;
+    setTimeout(() => { document.getElementById('error-msg').innerHTML = ''; }, 3000);
+  } catch(e) {
+    document.getElementById('error-msg').innerHTML =
+      `<div class="alert alert-error">${e.message}</div>`;
+  }
+});
+
+// ── Load saved ────────────────────────────────────────────────
+async function loadSavedCharts() {
+  const container = document.getElementById('saved-charts-list');
+  try {
+    const data = await API.get('/api/natal/list');
+    if (!data.charts.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><p>No hay cartas guardadas</p></div>';
+      return;
+    }
+    container.innerHTML = data.charts.map(c => `
+      <div class="saved-chart-item" data-id="${c.id}">
+        <div>
+          <div class="name">${c.name}</div>
+          <div class="meta">${c.birth_date} ${c.birth_time} · ${c.city_name || c.timezone}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" data-del="${c.id}" title="Eliminar">✕</button>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.saved-chart-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        if (e.target.dataset.del) return; // handled separately
+        const id = item.dataset.id;
+        try {
+          const data = await API.get(`/api/natal/load/${id}`);
+          currentChart = data;
+          renderResults(data);
+          if (data.meta) {
+            document.getElementById('name').value = data.meta.name;
+          }
+          document.getElementById('btn-save').disabled = false;
+        } catch(e) {
+          alert('Error cargando carta: ' + e.message);
+        }
+      });
+    });
+
+    container.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('¿Eliminar esta carta?')) return;
+        try {
+          await API.del(`/api/natal/delete/${btn.dataset.del}`);
+          loadSavedCharts();
+        } catch(e) { alert(e.message); }
+      });
+    });
+  } catch(e) {
+    container.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+  }
+}
+
+// ── Render results ────────────────────────────────────────────
+function renderResults(data) {
+  document.getElementById('empty-area').style.display = 'none';
+  document.getElementById('results-area').style.display = 'block';
+
+  // Draw wheel
+  const svg = document.getElementById('chart-wheel');
+  drawChartWheel(svg, data);
+
+  // ASC / MC strip
+  const ascSign = lonToSignStr(data.ascendant);
+  const mcSign  = lonToSignStr(data.mc);
+  document.getElementById('asc-mc-strip').innerHTML = `
+    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:8px;padding:8px 16px">
+      <span style="color:var(--text-dim);font-size:12px">ASC</span>
+      <span style="color:var(--accent);font-weight:700;margin-left:8px">${ascSign}</span>
+    </div>
+    <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:8px 16px">
+      <span style="color:var(--text-dim);font-size:12px">MC</span>
+      <span style="color:var(--text-gold);font-weight:700;margin-left:8px">${mcSign}</span>
+    </div>
+    <div style="background:rgba(42,42,85,0.5);border:1px solid var(--border);border-radius:8px;padding:8px 16px">
+      <span style="color:var(--text-dim);font-size:12px">Casas</span>
+      <span style="color:var(--text);font-weight:600;margin-left:8px">${data.house_system === 'P' ? 'Placidus' : data.house_system}</span>
+    </div>
+  `;
+
+  // Planet table
+  renderPlanetTable(data.planets, 'planet-table-container', getDignity);
+
+  // Aspects
+  renderAspects(data.aspects, 'aspects-container');
+
+  // Interpretations
+  renderInterpretations(data.interpretations, 'interpretations-container');
+}
+
+function lonToSignStr(lon) {
+  const signs = ['Aries','Tauro','Géminis','Cáncer','Leo','Virgo',
+                 'Libra','Escorpio','Sagitario','Capricornio','Acuario','Piscis'];
+  const idx = Math.floor(lon / 30) % 12;
+  const deg = Math.floor(lon % 30);
+  const min = Math.floor((lon % 1) * 60);
+  return `${deg}°${String(min).padStart(2,'0')}' ${signs[idx]}`;
+}
+
+// Expose lonToAngle needed by drawChartWheel
+function lonToAngle(lon, asc) {
+  return (180 - (lon - asc) + 360) % 360;
+}
+</script>
+</body>
+</html>
