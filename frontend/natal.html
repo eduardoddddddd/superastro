@@ -19,10 +19,11 @@
 </nav>
 
 <div class="container">
-  <div class="grid-2">
+  <div class="layout-3col">
 
-    <!-- ── LEFT: Form + Saved ─────────────────────── -->
-    <div>
+    <!-- ── COL 1: Formulario + Guardadas ──────────────── -->
+    <div class="col-side">
+
       <div class="card">
         <div class="card-title">Datos de Nacimiento</div>
 
@@ -81,19 +82,20 @@
 
         <div id="error-msg"></div>
 
-        <div style="display:flex;gap:10px">
+        <div style="display:flex;gap:8px">
           <button class="btn btn-primary" id="btn-calculate" style="flex:1">
             <span id="btn-text">Calcular Carta</span>
           </button>
-          <button class="btn btn-secondary" id="btn-save" title="Guardar carta" style="width:48px;justify-content:center" disabled>
+          <button class="btn btn-secondary" id="btn-save" title="Guardar carta"
+                  style="width:42px;justify-content:center;padding:9px 0" disabled>
             💾
           </button>
         </div>
       </div>
 
-      <!-- Saved charts -->
-      <div class="card" style="margin-top:20px">
-        <div class="card-title" style="margin-bottom:12px">Cartas Guardadas</div>
+      <!-- Cartas guardadas -->
+      <div class="card">
+        <div class="card-title">Cartas Guardadas</div>
         <div id="saved-charts-list">
           <div class="empty-state">
             <div class="empty-state-icon">📂</div>
@@ -101,68 +103,66 @@
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- ── RIGHT: Results ─────────────────────────── -->
-    <div id="results-area" style="display:none">
-
-      <!-- Chart wheel -->
-      <div class="card" style="margin-bottom:20px">
+    <!-- ── COL 2: Rueda (sticky) ───────────────────────── -->
+    <div class="col-wheel">
+      <div class="card">
         <div class="card-title">Rueda Astrológica</div>
-        <div id="chart-wheel-container">
+        <div class="wheel-wrapper">
           <svg id="chart-wheel" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <!-- ASC / MC strip -->
-        <div id="asc-mc-strip" style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap"></div>
+        <div id="asc-mc-strip" class="axis-strip"></div>
       </div>
-
-      <!-- Tabs: planetas / aspectos / interpretaciones -->
-      <div class="card">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-planets">Planetas</button>
-          <button class="tab-btn" data-tab="tab-aspects">Aspectos</button>
-          <button class="tab-btn" data-tab="tab-interpretations">Interpretaciones</button>
-        </div>
-
-        <div class="tab-panel active" id="tab-planets">
-          <div id="planet-table-container"></div>
-        </div>
-
-        <div class="tab-panel" id="tab-aspects">
-          <div id="aspects-container"></div>
-        </div>
-
-        <div class="tab-panel" id="tab-interpretations">
-          <div id="interpretations-container"></div>
-        </div>
-      </div>
-
     </div>
 
-    <!-- Empty right panel -->
-    <div id="empty-area">
-      <div class="card" style="text-align:center;padding:60px 24px">
-        <div style="font-size:64px;margin-bottom:16px;opacity:0.3">🌟</div>
-        <div style="color:var(--text-dim);font-size:15px">
+    <!-- ── COL 3: Datos ────────────────────────────────── -->
+    <div class="col-data">
+
+      <!-- Estado vacío inicial -->
+      <div id="empty-area" class="card" style="text-align:center;padding:52px 20px">
+        <div style="font-size:52px;opacity:0.18;margin-bottom:14px">🌟</div>
+        <p style="color:var(--text-dim);font-size:13px;line-height:1.7">
           Introduce los datos de nacimiento<br>y pulsa <strong>Calcular Carta</strong>
+        </p>
+      </div>
+
+      <!-- Resultados -->
+      <div id="results-area" style="display:none">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="tab-planets">♅ Planetas</button>
+            <button class="tab-btn" data-tab="tab-aspects">⚹ Aspectos</button>
+            <button class="tab-btn" data-tab="tab-interpretations">✦ Interpretaciones</button>
+          </div>
+          <div class="tab-panel active" id="tab-planets">
+            <div id="planet-table-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-aspects">
+            <div id="aspects-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-interpretations">
+            <div id="interpretations-container"></div>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
 
 <script src="/assets/js/app.js"></script>
 <script>
-// ── Dignity helper (client-side, matches Python logic) ────────
+// ── Dignidades (client-side) ──────────────────────────────────
 const DIGNITIES = {
-  'Sol':      { dom: ['Leo'],      exalt: ['Aries'],      det: ['Acuario'],  fall: ['Libra'] },
-  'Luna':     { dom: ['Cáncer'],   exalt: ['Tauro'],      det: ['Capricornio'], fall: ['Escorpio'] },
-  'Mercurio': { dom: ['Géminis','Virgo'], exalt: ['Virgo'], det: ['Sagitario','Piscis'], fall: ['Piscis'] },
-  'Venus':    { dom: ['Tauro','Libra'],  exalt: ['Piscis'], det: ['Escorpio','Aries'],  fall: ['Virgo'] },
-  'Marte':    { dom: ['Aries','Escorpio'], exalt: ['Capricornio'], det: ['Libra','Tauro'], fall: ['Cáncer'] },
-  'Júpiter':  { dom: ['Sagitario','Piscis'], exalt: ['Cáncer'], det: ['Géminis','Virgo'], fall: ['Capricornio'] },
-  'Saturno':  { dom: ['Capricornio','Acuario'], exalt: ['Libra'], det: ['Cáncer','Leo'], fall: ['Aries'] },
+  'Sol':      { dom:['Leo'],                exalt:['Aries'],       det:['Acuario'],             fall:['Libra'] },
+  'Luna':     { dom:['Cáncer'],             exalt:['Tauro'],       det:['Capricornio'],         fall:['Escorpio'] },
+  'Mercurio': { dom:['Géminis','Virgo'],    exalt:['Virgo'],       det:['Sagitario','Piscis'],  fall:['Piscis'] },
+  'Venus':    { dom:['Tauro','Libra'],      exalt:['Piscis'],      det:['Escorpio','Aries'],    fall:['Virgo'] },
+  'Marte':    { dom:['Aries','Escorpio'],   exalt:['Capricornio'], det:['Libra','Tauro'],       fall:['Cáncer'] },
+  'Júpiter':  { dom:['Sagitario','Piscis'], exalt:['Cáncer'],      det:['Géminis','Virgo'],     fall:['Capricornio'] },
+  'Saturno':  { dom:['Capricornio','Acuario'], exalt:['Libra'],    det:['Cáncer','Leo'],        fall:['Aries'] },
 };
 function getDignity(planet, sign) {
   const d = DIGNITIES[planet];
@@ -174,25 +174,28 @@ function getDignity(planet, sign) {
   return 'Peregrino';
 }
 
-// ── State ─────────────────────────────────────────────────────
+// ── Estado ────────────────────────────────────────────────────
 let currentChart = null;
 let selectedCity = null;
 
 // ── Init ──────────────────────────────────────────────────────
 initCitySearch('city-input', 'city-results', (city) => {
   selectedCity = city;
-  document.getElementById('lat').value = city.lat;
-  document.getElementById('lon').value = city.lon;
+  document.getElementById('lat').value      = city.lat;
+  document.getElementById('lon').value      = city.lon;
   document.getElementById('timezone').value = city.timezone;
 });
-initTabs('.card');
+initTabs();
 loadSavedCharts();
 
-// ── Calculate ─────────────────────────────────────────────────
+// Rueda vacía decorativa al cargar
+drawEmptyWheel(document.getElementById('chart-wheel'));
+
+// ── Calcular ──────────────────────────────────────────────────
 document.getElementById('btn-calculate').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-calculate');
+  const btn     = document.getElementById('btn-calculate');
   const btnText = document.getElementById('btn-text');
-  const errEl = document.getElementById('error-msg');
+  const errEl   = document.getElementById('error-msg');
   errEl.innerHTML = '';
 
   const lat = parseFloat(document.getElementById('lat').value);
@@ -203,27 +206,23 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
     errEl.innerHTML = '<div class="alert alert-error">Selecciona una ciudad de la lista</div>';
     return;
   }
-
   btnText.innerHTML = '<span class="spinner"></span> Calculando...';
   btn.disabled = true;
 
   try {
     const data = await API.post('/api/natal/calculate', {
-      name: document.getElementById('name').value || 'Sin nombre',
-      year:   parseInt(document.getElementById('year').value),
-      month:  parseInt(document.getElementById('month').value),
-      day:    parseInt(document.getElementById('day').value),
-      hour:   parseInt(document.getElementById('hour').value),
-      minute: parseInt(document.getElementById('minute').value),
-      lat, lon,
-      timezone: tz,
+      name:         document.getElementById('name').value || 'Sin nombre',
+      year:         parseInt(document.getElementById('year').value),
+      month:        parseInt(document.getElementById('month').value),
+      day:          parseInt(document.getElementById('day').value),
+      hour:         parseInt(document.getElementById('hour').value),
+      minute:       parseInt(document.getElementById('minute').value),
+      lat, lon, timezone: tz,
       house_system: document.getElementById('house-system').value,
     });
-
     currentChart = data;
     renderResults(data);
     document.getElementById('btn-save').disabled = false;
-
   } catch (e) {
     errEl.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
   } finally {
@@ -232,11 +231,11 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
   }
 });
 
-// ── Save ──────────────────────────────────────────────────────
+// ── Guardar ───────────────────────────────────────────────────
 document.getElementById('btn-save').addEventListener('click', async () => {
-  const lat = parseFloat(document.getElementById('lat').value);
-  const lon = parseFloat(document.getElementById('lon').value);
-  const tz  = document.getElementById('timezone').value;
+  const lat  = parseFloat(document.getElementById('lat').value);
+  const lon  = parseFloat(document.getElementById('lon').value);
+  const tz   = document.getElementById('timezone').value;
   const name = document.getElementById('name').value || 'Sin nombre';
   try {
     await API.post('/api/natal/save', {
@@ -246,14 +245,13 @@ document.getElementById('btn-save').addEventListener('click', async () => {
       day:    parseInt(document.getElementById('day').value),
       hour:   parseInt(document.getElementById('hour').value),
       minute: parseInt(document.getElementById('minute').value),
-      lat, lon,
-      timezone: tz,
-      city_name: selectedCity ? selectedCity.display : '',
+      lat, lon, timezone: tz,
+      city_name:    selectedCity ? selectedCity.display : '',
       house_system: document.getElementById('house-system').value,
     });
     loadSavedCharts();
     document.getElementById('error-msg').innerHTML =
-      `<div class="alert alert-success">Carta de ${name} guardada</div>`;
+      `<div class="alert alert-success">Carta de ${name} guardada ✓</div>`;
     setTimeout(() => { document.getElementById('error-msg').innerHTML = ''; }, 3000);
   } catch(e) {
     document.getElementById('error-msg').innerHTML =
@@ -261,7 +259,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
   }
 });
 
-// ── Load saved ────────────────────────────────────────────────
+// ── Cargar guardadas ──────────────────────────────────────────
 async function loadSavedCharts() {
   const container = document.getElementById('saved-charts-list');
   try {
@@ -282,22 +280,30 @@ async function loadSavedCharts() {
 
     container.querySelectorAll('.saved-chart-item').forEach(item => {
       item.addEventListener('click', async (e) => {
-        if (e.target.dataset.del) return; // handled separately
-        const id = item.dataset.id;
+        if (e.target.dataset.del) return;
         try {
-          const data = await API.get(`/api/natal/load/${id}`);
+          const data = await API.get(`/api/natal/load/${item.dataset.id}`);
           currentChart = data;
           renderResults(data);
           if (data.meta) {
-            document.getElementById('name').value = data.meta.name;
+            const m = data.meta;
+            document.getElementById('name').value    = m.name;
+            const [y, mo, d] = m.birth_date.split('-');
+            const [h, min]   = m.birth_time.split(':');
+            document.getElementById('year').value    = y;
+            document.getElementById('month').value   = mo;
+            document.getElementById('day').value     = d;
+            document.getElementById('hour').value    = h;
+            document.getElementById('minute').value  = min;
+            document.getElementById('lat').value     = m.lat;
+            document.getElementById('lon').value     = m.lon;
+            document.getElementById('timezone').value = m.timezone;
+            if (m.city_name) document.getElementById('city-input').value = m.city_name;
           }
           document.getElementById('btn-save').disabled = false;
-        } catch(e) {
-          alert('Error cargando carta: ' + e.message);
-        }
+        } catch(e) { alert('Error cargando carta: ' + e.message); }
       });
     });
-
     container.querySelectorAll('[data-del]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -313,40 +319,32 @@ async function loadSavedCharts() {
   }
 }
 
-// ── Render results ────────────────────────────────────────────
+// ── Renderizar resultados ─────────────────────────────────────
 function renderResults(data) {
-  document.getElementById('empty-area').style.display = 'none';
+  document.getElementById('empty-area').style.display   = 'none';
   document.getElementById('results-area').style.display = 'block';
 
-  // Draw wheel
-  const svg = document.getElementById('chart-wheel');
-  drawChartWheel(svg, data);
+  // Rueda
+  drawChartWheel(document.getElementById('chart-wheel'), data);
 
-  // ASC / MC strip
-  const ascSign = lonToSignStr(data.ascendant);
-  const mcSign  = lonToSignStr(data.mc);
+  // Strip ASC / MC
   document.getElementById('asc-mc-strip').innerHTML = `
-    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:8px;padding:8px 16px">
-      <span style="color:var(--text-dim);font-size:12px">ASC</span>
-      <span style="color:var(--accent);font-weight:700;margin-left:8px">${ascSign}</span>
+    <div class="axis-pill axis-pill-asc">
+      <span class="axis-pill-label">ASC</span>
+      <span class="axis-pill-value">${lonToSignStr(data.ascendant)}</span>
     </div>
-    <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:8px 16px">
-      <span style="color:var(--text-dim);font-size:12px">MC</span>
-      <span style="color:var(--text-gold);font-weight:700;margin-left:8px">${mcSign}</span>
+    <div class="axis-pill axis-pill-mc">
+      <span class="axis-pill-label">MC</span>
+      <span class="axis-pill-value">${lonToSignStr(data.mc)}</span>
     </div>
-    <div style="background:rgba(42,42,85,0.5);border:1px solid var(--border);border-radius:8px;padding:8px 16px">
-      <span style="color:var(--text-dim);font-size:12px">Casas</span>
-      <span style="color:var(--text);font-weight:600;margin-left:8px">${data.house_system === 'P' ? 'Placidus' : data.house_system}</span>
+    <div class="axis-pill axis-pill-sys">
+      <span class="axis-pill-label">Casas</span>
+      <span class="axis-pill-value">${houseSysName(data.house_system)}</span>
     </div>
   `;
 
-  // Planet table
   renderPlanetTable(data.planets, 'planet-table-container', getDignity);
-
-  // Aspects
   renderAspects(data.aspects, 'aspects-container');
-
-  // Interpretations
   renderInterpretations(data.interpretations, 'interpretations-container');
 }
 
@@ -358,10 +356,8 @@ function lonToSignStr(lon) {
   const min = Math.floor((lon % 1) * 60);
   return `${deg}°${String(min).padStart(2,'0')}' ${signs[idx]}`;
 }
-
-// Expose lonToAngle needed by drawChartWheel
-function lonToAngle(lon, asc) {
-  return (180 - (lon - asc) + 360) % 360;
+function houseSysName(code) {
+  return { P:'Placidus', K:'Koch', R:'Regiomontanus', C:'Campanus', E:'Iguales' }[code] || code;
 }
 </script>
 </body>

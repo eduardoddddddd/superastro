@@ -19,29 +19,28 @@
 </nav>
 
 <div class="container">
-  <div class="grid-2">
+  <div class="layout-3col">
 
-    <!-- ── LEFT ─────────────────────────────────── -->
-    <div>
+    <!-- ── COL 1: Formularios ─────────────────────────── -->
+    <div class="col-side">
 
-      <!-- Source: carta natal -->
-      <div class="card" style="margin-bottom:20px">
+      <!-- Carta natal de referencia -->
+      <div class="card">
         <div class="card-title">Carta Natal de Referencia</div>
 
-        <!-- Option: from saved -->
-        <div style="margin-bottom:16px">
+        <div class="form-group">
           <label>Cargar carta guardada</label>
           <select id="saved-select">
-            <option value="">— Selecciona una carta guardada —</option>
+            <option value="">— Selecciona una carta —</option>
           </select>
         </div>
 
-        <div style="text-align:center;color:var(--text-dim);font-size:12px;margin-bottom:12px">— o introduce datos manualmente —</div>
+        <div style="text-align:center;color:var(--text-dim);font-size:11px;margin:6px 0">— o introduce datos manualmente —</div>
 
         <div class="form-group">
-          <label>Ciudad de nacimiento</label>
+          <label>Ciudad natal</label>
           <div class="autocomplete-wrapper">
-            <input type="text" id="natal-city" placeholder="Escribe la ciudad...">
+            <input type="text" id="natal-city" placeholder="Ciudad de nacimiento...">
             <div class="autocomplete-results" id="natal-city-results"></div>
           </div>
           <input type="hidden" id="natal-lat">
@@ -50,144 +49,113 @@
         </div>
 
         <div class="form-row-3">
-          <div class="form-group">
-            <label>Año</label>
-            <input type="number" id="natal-year" placeholder="1990">
-          </div>
-          <div class="form-group">
-            <label>Mes</label>
-            <input type="number" id="natal-month" placeholder="6">
-          </div>
-          <div class="form-group">
-            <label>Día</label>
-            <input type="number" id="natal-day" placeholder="15">
-          </div>
+          <div class="form-group"><label>Año</label><input type="number" id="natal-year" placeholder="1990"></div>
+          <div class="form-group"><label>Mes</label><input type="number" id="natal-month" placeholder="6"></div>
+          <div class="form-group"><label>Día</label><input type="number" id="natal-day" placeholder="15"></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Hora</label>
-            <input type="number" id="natal-hour" placeholder="14">
-          </div>
-          <div class="form-group">
-            <label>Min</label>
-            <input type="number" id="natal-minute" placeholder="30">
-          </div>
+          <div class="form-group"><label>Hora</label><input type="number" id="natal-hour" placeholder="14"></div>
+          <div class="form-group"><label>Min</label><input type="number" id="natal-minute" placeholder="30"></div>
         </div>
       </div>
 
-      <!-- Transit date -->
+      <!-- Fecha del tránsito -->
       <div class="card">
         <div class="card-title">Fecha del Tránsito</div>
 
         <div class="form-group">
-          <label>Ciudad (para casas del tránsito)</label>
+          <label>Ciudad (para casas)</label>
           <div class="autocomplete-wrapper">
-            <input type="text" id="transit-city" placeholder="Misma que natal o diferente...">
+            <input type="text" id="transit-city" placeholder="Ciudad actual...">
             <div class="autocomplete-results" id="transit-city-results"></div>
           </div>
           <input type="hidden" id="transit-tz">
         </div>
 
         <div class="form-row-3">
-          <div class="form-group">
-            <label>Año</label>
-            <input type="number" id="transit-year">
-          </div>
-          <div class="form-group">
-            <label>Mes</label>
-            <input type="number" id="transit-month">
-          </div>
-          <div class="form-group">
-            <label>Día</label>
-            <input type="number" id="transit-day">
-          </div>
+          <div class="form-group"><label>Año</label><input type="number" id="transit-year"></div>
+          <div class="form-group"><label>Mes</label><input type="number" id="transit-month"></div>
+          <div class="form-group"><label>Día</label><input type="number" id="transit-day"></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Hora</label>
-            <input type="number" id="transit-hour">
-          </div>
-          <div class="form-group">
-            <label>Min</label>
-            <input type="number" id="transit-minute">
-          </div>
+          <div class="form-group"><label>Hora</label><input type="number" id="transit-hour"></div>
+          <div class="form-group"><label>Min</label><input type="number" id="transit-minute"></div>
         </div>
 
-        <button class="btn btn-secondary btn-sm" id="btn-now" style="margin-bottom:14px;width:100%">
-          📅 Usar fecha y hora actuales
+        <button class="btn btn-secondary btn-sm" id="btn-now" style="margin-bottom:10px;width:100%">
+          📅 Usar fecha/hora actuales
         </button>
 
         <div id="error-transit"></div>
-
         <button class="btn btn-primary" id="btn-calculate">
           <span id="btn-text">Calcular Tránsitos</span>
         </button>
       </div>
+
     </div>
 
-    <!-- ── RIGHT ─────────────────────────────────── -->
-    <div id="results-area" style="display:none">
-
-      <!-- Chart wheel with transits -->
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-title">Rueda — Natal + Tránsitos</div>
-        <div id="chart-wheel-container">
+    <!-- ── COL 2: Rueda (sticky) ───────────────────────── -->
+    <div class="col-wheel">
+      <div class="card">
+        <div class="card-title">Rueda Natal + Tránsitos</div>
+        <div class="wheel-wrapper">
           <svg id="chart-wheel" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div style="display:flex;gap:12px;margin-top:12px;font-size:12px">
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:12px;height:12px;border-radius:2px;background:rgba(167,139,250,0.4);border:1px solid #a78bfa"></div>
-            <span style="color:var(--text-dim)">Planetas natales</span>
+        <div class="wheel-legend" style="margin-top:10px">
+          <div class="wheel-legend-item">
+            <div class="wheel-legend-dot" style="background:rgba(109,40,217,0.35);border:1px solid #6d28d9"></div>
+            Natales
           </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:12px;height:12px;border-radius:2px;background:rgba(52,211,153,0.3);border:1px solid #34d399"></div>
-            <span style="color:var(--text-dim)">Planetas en tránsito</span>
+          <div class="wheel-legend-item">
+            <div class="wheel-legend-dot" style="background:rgba(22,163,74,0.3);border:1px solid #16a34a"></div>
+            Tránsitos
           </div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="card">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-t-aspects">Aspectos de Tránsito</button>
-          <button class="tab-btn" data-tab="tab-t-planets">Planetas en Tránsito</button>
-          <button class="tab-btn" data-tab="tab-t-natal">Posiciones Natales</button>
-          <button class="tab-btn" data-tab="tab-t-interp">Interpretaciones</button>
-        </div>
-
-        <div class="tab-panel active" id="tab-t-aspects">
-          <div id="transit-aspects-container"></div>
-        </div>
-        <div class="tab-panel" id="tab-t-planets">
-          <div id="transit-planets-container"></div>
-        </div>
-        <div class="tab-panel" id="tab-t-natal">
-          <div id="natal-planets-container"></div>
-        </div>
-        <div class="tab-panel" id="tab-t-interp">
-          <div id="transit-interp-container"></div>
         </div>
       </div>
     </div>
 
-    <div id="empty-area">
-      <div class="card" style="text-align:center;padding:60px 24px">
-        <div style="font-size:64px;margin-bottom:16px;opacity:0.3">🌍</div>
-        <div style="color:var(--text-dim);font-size:15px">
-          Selecciona una carta natal y una fecha<br>para ver los tránsitos activos
+    <!-- ── COL 3: Resultados ───────────────────────────── -->
+    <div class="col-data">
+
+      <div id="empty-area" class="card" style="text-align:center;padding:52px 20px">
+        <div style="font-size:52px;opacity:0.18;margin-bottom:14px">🌍</div>
+        <p style="color:var(--text-dim);font-size:13px;line-height:1.7">
+          Selecciona la carta natal y una fecha<br>para ver los tránsitos activos
+        </p>
+      </div>
+
+      <div id="results-area" style="display:none">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="tab-t-aspects">⚹ Aspectos</button>
+            <button class="tab-btn" data-tab="tab-t-planets">♅ Tránsitos</button>
+            <button class="tab-btn" data-tab="tab-t-natal">☉ Natales</button>
+            <button class="tab-btn" data-tab="tab-t-interp">✦ Análisis</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-t-aspects">
+            <div id="transit-aspects-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-t-planets">
+            <div id="transit-planets-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-t-natal">
+            <div id="natal-planets-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-t-interp">
+            <div id="transit-interp-container"></div>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
 
 <script src="/assets/js/app.js"></script>
 <script>
+let savedChartData = null;
 
-let savedChartData = null;  // full natal chart from server
-
-// Init city searches
 initCitySearch('natal-city', 'natal-city-results', (city) => {
   document.getElementById('natal-lat').value = city.lat;
   document.getElementById('natal-lon').value = city.lon;
@@ -196,9 +164,11 @@ initCitySearch('natal-city', 'natal-city-results', (city) => {
 initCitySearch('transit-city', 'transit-city-results', (city) => {
   document.getElementById('transit-tz').value = city.timezone;
 });
-initTabs('.card');
+initTabs();
 
-// Fill transit date/time now
+// Rueda decorativa inicial
+drawEmptyWheel(document.getElementById('chart-wheel'));
+
 function fillTransitNow() {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
@@ -211,7 +181,7 @@ function fillTransitNow() {
 fillTransitNow();
 document.getElementById('btn-now').addEventListener('click', fillTransitNow);
 
-// Load saved charts into select
+// Cargar cartas guardadas en select
 async function loadSavedSelect() {
   const sel = document.getElementById('saved-select');
   try {
@@ -232,10 +202,9 @@ document.getElementById('saved-select').addEventListener('change', async (e) => 
   try {
     const data = await API.get(`/api/natal/load/${id}`);
     savedChartData = data;
-    // Fill natal fields from meta
     if (data.meta) {
       const [y, m, d] = data.meta.birth_date.split('-');
-      const [h, min] = data.meta.birth_time.split(':');
+      const [h, min]  = data.meta.birth_time.split(':');
       document.getElementById('natal-year').value   = y;
       document.getElementById('natal-month').value  = m;
       document.getElementById('natal-day').value    = d;
@@ -245,23 +214,20 @@ document.getElementById('saved-select').addEventListener('change', async (e) => 
       document.getElementById('natal-lon').value    = data.meta.lon;
       document.getElementById('natal-tz').value     = data.meta.timezone;
       document.getElementById('natal-city').value   = data.meta.city_name || '';
-      // Mirror transit city to natal city
       document.getElementById('transit-city').value = data.meta.city_name || '';
       document.getElementById('transit-tz').value   = data.meta.timezone;
     }
   } catch(e) { alert('Error: ' + e.message); }
 });
 
-// Calculate
 document.getElementById('btn-calculate').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-calculate');
+  const btn     = document.getElementById('btn-calculate');
   const btnText = document.getElementById('btn-text');
-  const errEl = document.getElementById('error-transit');
+  const errEl   = document.getElementById('error-transit');
   errEl.innerHTML = '';
 
-  const natalLat = parseFloat(document.getElementById('natal-lat').value);
-  const natalLon = parseFloat(document.getElementById('natal-lon').value);
-  const natalTz  = document.getElementById('natal-tz').value;
+  const natalLat  = parseFloat(document.getElementById('natal-lat').value);
+  const natalTz   = document.getElementById('natal-tz').value;
   const transitTz = document.getElementById('transit-tz').value || natalTz;
 
   if (!natalTz || isNaN(natalLat)) {
@@ -273,14 +239,14 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
   btn.disabled = true;
 
   try {
-    const payload = {
-      natal_year:   parseInt(document.getElementById('natal-year').value),
-      natal_month:  parseInt(document.getElementById('natal-month').value),
-      natal_day:    parseInt(document.getElementById('natal-day').value),
-      natal_hour:   parseInt(document.getElementById('natal-hour').value),
-      natal_minute: parseInt(document.getElementById('natal-minute').value),
-      natal_lat:    natalLat,
-      natal_lon:    natalLon,
+    const data = await API.post('/api/transits/calculate', {
+      natal_year:    parseInt(document.getElementById('natal-year').value),
+      natal_month:   parseInt(document.getElementById('natal-month').value),
+      natal_day:     parseInt(document.getElementById('natal-day').value),
+      natal_hour:    parseInt(document.getElementById('natal-hour').value),
+      natal_minute:  parseInt(document.getElementById('natal-minute').value),
+      natal_lat:     natalLat,
+      natal_lon:     parseFloat(document.getElementById('natal-lon').value),
       natal_timezone: natalTz,
       transit_year:   parseInt(document.getElementById('transit-year').value),
       transit_month:  parseInt(document.getElementById('transit-month').value),
@@ -288,8 +254,7 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
       transit_hour:   parseInt(document.getElementById('transit-hour').value),
       transit_minute: parseInt(document.getElementById('transit-minute').value),
       transit_timezone: transitTz,
-    };
-    const data = await API.post('/api/transits/calculate', payload);
+    });
     renderTransitResults(data);
   } catch(e) {
     errEl.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
@@ -300,46 +265,38 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
 });
 
 function renderTransitResults(data) {
-  document.getElementById('empty-area').style.display = 'none';
+  document.getElementById('empty-area').style.display   = 'none';
   document.getElementById('results-area').style.display = 'block';
 
-  // Wheel
-  const svg = document.getElementById('chart-wheel');
-  const natalChartForWheel = {
-    planets: data.natal_planets,
-    cusps: data.natal_cusps,
-    ascendant: data.natal_ascendant,
-    mc: data.natal_mc,
-    aspects: data.natal_aspects,
-  };
-  const transitForWheel = { transit_planets: data.transit_planets };
-  drawChartWheel(svg, natalChartForWheel, transitForWheel);
+  drawChartWheel(document.getElementById('chart-wheel'), {
+    planets: data.natal_planets, cusps: data.natal_cusps,
+    ascendant: data.natal_ascendant, mc: data.natal_mc, aspects: data.natal_aspects,
+  }, { transit_planets: data.transit_planets });
 
-  // Transit aspects list
-  const taContainer = document.getElementById('transit-aspects-container');
+  // Aspectos de tránsito
+  const taC = document.getElementById('transit-aspects-container');
   if (!data.transit_aspects.length) {
-    taContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✦</div><p>Sin aspectos de tránsito activos</p></div>';
+    taC.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✦</div><p>Sin aspectos activos</p></div>';
   } else {
-    taContainer.innerHTML = data.transit_aspects.map(ta => `
+    taC.innerHTML = data.transit_aspects.map(ta => `
       <div class="transit-aspect-row">
-        <span style="font-weight:600;min-width:70px;color:#34d399">${ta.transit_planet}</span>
-        <span class="aspect-badge ${aspectClass(ta.aspect_name)}">${ta.aspect_name}</span>
-        <span style="min-width:70px">${ta.natal_planet}</span>
-        <span class="applying-badge ${ta.is_applying ? 'applying' : 'separating'}">
-          ${ta.is_applying ? '● aplicativo' : '○ separativo'}
+        <span style="font-weight:600;min-width:64px;color:var(--accent3);display:flex;align-items:center;gap:3px">
+          <span style="font-family:'Segoe UI Symbol',sans-serif">${PLANET_ABBR[ta.transit_planet]||''}</span>${ta.transit_planet}
         </span>
-        <span style="color:var(--text-dim);margin-left:auto;font-size:11px">orb ${ta.orb}°</span>
+        <span class="aspect-badge ${aspectClass(ta.aspect_name)}">${ta.aspect_name}</span>
+        <span style="min-width:64px;display:flex;align-items:center;gap:3px">
+          <span style="font-family:'Segoe UI Symbol',sans-serif">${PLANET_ABBR[ta.natal_planet]||''}</span>${ta.natal_planet}
+        </span>
+        <span class="applying-badge ${ta.is_applying ? 'applying' : 'separating'}">
+          ${ta.is_applying ? '▲ aplic.' : '▽ sep.'}
+        </span>
+        <span style="color:var(--text-dim);margin-left:auto;font-size:11px">${ta.orb}°</span>
       </div>
     `).join('');
   }
 
-  // Transit planets table
   renderPlanetTable(data.transit_planets, 'transit-planets-container', null);
-
-  // Natal planets table
-  renderPlanetTable(data.natal_planets, 'natal-planets-container', null);
-
-  // Interpretations
+  renderPlanetTable(data.natal_planets,   'natal-planets-container',   null);
   renderInterpretations(data.interpretations, 'transit-interp-container');
 }
 </script>

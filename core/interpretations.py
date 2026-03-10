@@ -355,7 +355,7 @@ def _check_reception(p1_name: str, p1_sign: str, p2_name: str, p2_sign: str) -> 
     return ""
 
 
-def interpret_horary(chart: ChartData) -> list[tuple[str, str]]:
+def interpret_horary(chart: ChartData, question: str = "") -> list[tuple[str, str]]:
     """Interpretación detallada de una carta horaria según reglas tradicionales."""
     sections = []
     planets_map = {p.name: p for p in chart.planets}

@@ -19,17 +19,17 @@
 </nav>
 
 <div class="container">
-  <div class="grid-2">
+  <div class="layout-3col">
 
-    <!-- ── LEFT ─────────────────────────────────── -->
-    <div>
+    <!-- ── COL 1: Formulario ──────────────────────────── -->
+    <div class="col-side">
+
       <div class="card">
         <div class="card-title">Pregunta Horaria</div>
 
         <div class="form-group">
           <label>Tu pregunta</label>
-          <textarea id="question" rows="3"
-            placeholder="Ej: ¿Conseguiré el trabajo al que he aplicado?" style="resize:vertical"></textarea>
+          <textarea id="question" rows="3" placeholder="¿Conseguiré el trabajo al que he aplicado?" style="resize:vertical"></textarea>
         </div>
 
         <div class="form-group">
@@ -43,111 +43,99 @@
           <input type="hidden" id="timezone">
         </div>
 
-        <div style="margin-bottom:8px">
-          <button class="btn btn-secondary btn-sm" id="btn-now" style="width:100%">
-            📅 Usar fecha y hora actuales
-          </button>
-        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-now" style="width:100%;margin-bottom:8px">
+          📅 Usar fecha y hora actuales
+        </button>
 
         <div class="form-row-3">
-          <div class="form-group">
-            <label>Año</label>
-            <input type="number" id="year" placeholder="2026">
-          </div>
-          <div class="form-group">
-            <label>Mes</label>
-            <input type="number" id="month" placeholder="2">
-          </div>
-          <div class="form-group">
-            <label>Día</label>
-            <input type="number" id="day" placeholder="23">
-          </div>
+          <div class="form-group"><label>Año</label><input type="number" id="year" placeholder="2026"></div>
+          <div class="form-group"><label>Mes</label><input type="number" id="month" placeholder="2"></div>
+          <div class="form-group"><label>Día</label><input type="number" id="day" placeholder="24"></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Hora</label>
-            <input type="number" id="hour" placeholder="15">
-          </div>
-          <div class="form-group">
-            <label>Min</label>
-            <input type="number" id="minute" placeholder="0">
-          </div>
+          <div class="form-group"><label>Hora</label><input type="number" id="hour" placeholder="15"></div>
+          <div class="form-group"><label>Min</label><input type="number" id="minute" placeholder="0"></div>
         </div>
 
         <div id="error-msg"></div>
-
         <button class="btn btn-primary" id="btn-calculate">
           <span id="btn-text">🔮 Calcular Horaria</span>
         </button>
+      </div>
 
-        <!-- Horary guide -->
-        <div style="margin-top:20px;padding:16px;background:rgba(167,139,250,0.05);border-radius:8px;border:1px solid rgba(167,139,250,0.15)">
-          <div style="font-size:12px;color:var(--text-dim);line-height:1.8">
-            <strong style="color:var(--accent)">Guía de la Horaria</strong><br>
-            La astrología horaria usa Regiomontanus.<br>
-            Formula la pregunta con claridad antes de calcular.<br>
-            El momento exacto en que surge la duda es el momento a usar.<br>
-            Los <strong style="color:var(--text)">Señores de Casa</strong> son los factores principales.
+      <!-- Guía horaria -->
+      <div class="card">
+        <div class="card-title">Guía Horaria</div>
+        <div style="font-size:12px;color:var(--text-dim);line-height:1.9">
+          <div style="margin-bottom:6px">🏛️ Sistema <strong style="color:var(--text)">Regiomontanus</strong></div>
+          <div style="margin-bottom:6px">🎯 Formula la pregunta con <strong style="color:var(--text)">claridad</strong> antes de calcular</div>
+          <div style="margin-bottom:6px">⏱️ El momento en que <strong style="color:var(--text)">surge la duda</strong> es el momento a usar</div>
+          <div>🔑 Los <strong style="color:var(--text)">Señores de Casa</strong> son los factores principales</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── COL 2: Rueda (sticky) ───────────────────────── -->
+    <div class="col-wheel">
+      <div class="card">
+        <div class="card-title">Rueda Horaria · Regiomontanus</div>
+        <div class="wheel-wrapper">
+          <svg id="chart-wheel" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+
+        <!-- Pregunta display (aparece tras calcular) -->
+        <div id="question-display-box" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.2);border-radius:8px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:4px">Pregunta</div>
+          <div id="question-display" style="font-size:13px;font-weight:600;font-style:italic;color:var(--text)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COL 3: Resultados ───────────────────────────── -->
+    <div class="col-data">
+
+      <div id="empty-area" class="card" style="text-align:center;padding:52px 20px">
+        <div style="font-size:52px;opacity:0.18;margin-bottom:14px">🔮</div>
+        <p style="color:var(--text-dim);font-size:13px;line-height:1.7">
+          Formula tu pregunta y elige la ubicación<br>para obtener el análisis horario
+        </p>
+      </div>
+
+      <div id="results-area" style="display:none">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="tab-h-interp">✦ Análisis</button>
+            <button class="tab-btn" data-tab="tab-h-planets">♅ Planetas</button>
+            <button class="tab-btn" data-tab="tab-h-aspects">⚹ Aspectos</button>
+          </div>
+          <div class="tab-panel active" id="tab-h-interp">
+            <div id="horary-interp-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-h-planets">
+            <div id="horary-planet-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-h-aspects">
+            <div id="horary-aspects-container"></div>
           </div>
         </div>
       </div>
+
     </div>
-
-    <!-- ── RIGHT ─────────────────────────────────── -->
-    <div id="results-area" style="display:none">
-      <!-- Question header -->
-      <div id="question-header" class="card" style="margin-bottom:20px;background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.3)">
-        <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">PREGUNTA</div>
-        <div id="question-display" style="font-size:16px;font-weight:600;font-style:italic"></div>
-      </div>
-
-      <!-- Wheel -->
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-title">Rueda Horaria (Regiomontanus)</div>
-        <div id="chart-wheel-container">
-          <svg id="chart-wheel" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="card">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-h-interp">Análisis</button>
-          <button class="tab-btn" data-tab="tab-h-planets">Planetas</button>
-          <button class="tab-btn" data-tab="tab-h-aspects">Aspectos</button>
-        </div>
-        <div class="tab-panel active" id="tab-h-interp">
-          <div id="horary-interp-container"></div>
-        </div>
-        <div class="tab-panel" id="tab-h-planets">
-          <div id="horary-planet-container"></div>
-        </div>
-        <div class="tab-panel" id="tab-h-aspects">
-          <div id="horary-aspects-container"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="empty-area">
-      <div class="card" style="text-align:center;padding:60px 24px">
-        <div style="font-size:64px;margin-bottom:16px;opacity:0.3">🔮</div>
-        <div style="color:var(--text-dim);font-size:15px">
-          Formula tu pregunta y elige la ubicación<br>para obtener el análisis horario
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script src="/assets/js/app.js"></script>
 <script>
 initCitySearch('city-input', 'city-results', (city) => {
-  document.getElementById('lat').value = city.lat;
-  document.getElementById('lon').value = city.lon;
+  document.getElementById('lat').value      = city.lat;
+  document.getElementById('lon').value      = city.lon;
   document.getElementById('timezone').value = city.timezone;
 });
-initTabs('.card');
+initTabs();
+
+// Rueda decorativa al cargar
+drawEmptyWheel(document.getElementById('chart-wheel'));
 
 function fillNow() {
   const now = new Date();
@@ -162,15 +150,14 @@ fillNow();
 document.getElementById('btn-now').addEventListener('click', fillNow);
 
 document.getElementById('btn-calculate').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-calculate');
+  const btn     = document.getElementById('btn-calculate');
   const btnText = document.getElementById('btn-text');
-  const errEl = document.getElementById('error-msg');
+  const errEl   = document.getElementById('error-msg');
   errEl.innerHTML = '';
 
   const question = document.getElementById('question').value.trim();
-  const lat  = parseFloat(document.getElementById('lat').value);
-  const lon  = parseFloat(document.getElementById('lon').value);
-  const tz   = document.getElementById('timezone').value;
+  const lat = parseFloat(document.getElementById('lat').value);
+  const tz  = document.getElementById('timezone').value;
 
   if (!question) {
     errEl.innerHTML = '<div class="alert alert-error">Introduce una pregunta</div>';
@@ -192,25 +179,23 @@ document.getElementById('btn-calculate').addEventListener('click', async () => {
       day:    parseInt(document.getElementById('day').value),
       hour:   parseInt(document.getElementById('hour').value),
       minute: parseInt(document.getElementById('minute').value),
-      lat, lon,
+      lat,
+      lon: parseFloat(document.getElementById('lon').value),
       timezone: tz,
     });
 
-    document.getElementById('empty-area').style.display = 'none';
+    document.getElementById('empty-area').style.display   = 'none';
     document.getElementById('results-area').style.display = 'block';
+
+    // Mostrar pregunta debajo de la rueda
+    document.getElementById('question-display-box').style.display = 'block';
     document.getElementById('question-display').textContent = `"${data.question}"`;
 
-    // Wheel
-    const svg = document.getElementById('chart-wheel');
-    drawChartWheel(svg, {
-      planets: data.planets,
-      cusps: data.cusps,
-      ascendant: data.ascendant,
-      mc: data.mc,
-      aspects: data.aspects,
+    drawChartWheel(document.getElementById('chart-wheel'), {
+      planets: data.planets, cusps: data.cusps,
+      ascendant: data.ascendant, mc: data.mc, aspects: data.aspects,
     });
 
-    // Interpretations
     renderInterpretations(data.interpretations, 'horary-interp-container');
     renderPlanetTable(data.planets, 'horary-planet-container', null);
     renderAspects(data.aspects, 'horary-aspects-container');
